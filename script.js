@@ -4,6 +4,14 @@ const context = canvas.getContext("2d");
 const cellSize = 20;
 const cellCount = canvas.width / cellSize;
 
+const eatSound = new Audio("assets/sounds/eat.mp3");
+const deathSound = new Audio("assets/sounds/death.mp3");
+const backgroundMusic = new Audio("assets/sounds/music_game.mp3");
+backgroundMusic.loop = true;
+backgroundMusic.volume = 0.2;
+
+const restartBtn = document.getElementById("restartBtn");
+
 let snake = [{ x: 10, y: 10 }];
 let directionX = 1;
 let directionY = 0;
@@ -36,22 +44,31 @@ function changeDirection(event) {
       if (directionX === 0) { directionX = 1; directionY = 0; }
       break;
   }
+  
+  // Reproducir música solo una vez al presionar una tecla
+  document.addEventListener("keydown", function startMusicOnce(e) {
+    backgroundMusic.play();
+    document.removeEventListener("keydown", startMusicOnce);
+  });
 }
 
 function drawGame() {
   if (gameOver) {
-    context.fillStyle = "black";
-    context.fillRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = "black";
+  context.fillRect(0, 0, canvas.width, canvas.height);
 
-    context.fillStyle = "white";
-    context.font = "40px Arial";
-    context.textAlign = "center";
-    context.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
-    context.font = "30px Arial";
-    context.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 30);
-    clearInterval(gameInterval);
-    return; 
-  } 
+  context.fillStyle = "white";
+  context.font = "40px Arial";
+  context.textAlign = "center";
+  context.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
+  context.font = "30px Arial";
+  context.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 30);
+
+  clearInterval(gameInterval);
+  restartBtn.style.display = "block";  // ← Mostrar botón
+  return;
+}
+
 
   let headX = snake[0].x + directionX;
   let headY = snake[0].y + directionY;
@@ -77,13 +94,14 @@ function drawGame() {
   for (let i = 0; i < snake.length; i++) {
     if (head.x === snake[i].x && head.y === snake[i].y) {
       gameOver = true;
-      break;
+      deathSound.play();
+      return;
     }
   }
 
-  if (gameOver) return;
-
   if (head.x === fruit.x && head.y === fruit.y) {
+    eatSound.currentTime = 0;
+    eatSound.play();
     score += 5;
     fruit.x = Math.floor(Math.random() * cellCount);
     fruit.y = Math.floor(Math.random() * cellCount);
@@ -124,4 +142,22 @@ function increaseSpeed() {
   }
 }
 
+// Reiniciar juego al hacer clic en el botón
+restartBtn.addEventListener("click", function () {
+  snake = [{ x: 10, y: 10 }];
+  directionX = 1;
+  directionY = 0;
+  score = 0;
+  gameOver = false;
+  fruit = {
+    x: Math.floor(Math.random() * cellCount),
+    y: Math.floor(Math.random() * cellCount)
+  };
+  gameSpeed = 150;
+
+  restartBtn.style.display = "none";
+  gameInterval = setInterval(drawGame, gameSpeed);
+});
+
 gameInterval = setInterval(drawGame, gameSpeed);
+
