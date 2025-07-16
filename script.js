@@ -23,6 +23,7 @@ let fruit = {
 };
 
 let gameOver = false;
+let musicPlaying = false;
 
 document.addEventListener("keydown", changeDirection);
 
@@ -44,31 +45,35 @@ function changeDirection(event) {
       if (directionX === 0) { directionX = 1; directionY = 0; }
       break;
   }
-  
-  // Reproducir música solo una vez al presionar una tecla
-  document.addEventListener("keydown", function startMusicOnce(e) {
+
+  if (!musicPlaying) {
     backgroundMusic.play();
-    document.removeEventListener("keydown", startMusicOnce);
-  });
+    musicPlaying = true;
+  }
 }
 
 function drawGame() {
   if (gameOver) {
-  context.fillStyle = "black";
-  context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = "black";
+    context.fillRect(0, 0, canvas.width, canvas.height);
 
-  context.fillStyle = "white";
-  context.font = "40px Arial";
-  context.textAlign = "center";
-  context.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
-  context.font = "30px Arial";
-  context.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 30);
+    context.fillStyle = "white";
+    context.font = "40px Arial";
+    context.textAlign = "center";
+    context.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 20);
+    context.font = "30px Arial";
+    context.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 30);
 
-  clearInterval(gameInterval);
-  restartBtn.style.display = "block";  // ← Mostrar botón
-  return;
-}
+    clearInterval(gameInterval);
+    restartBtn.style.display = "block"; 
 
+    if (musicPlaying) {
+      backgroundMusic.pause();
+      backgroundMusic.currentTime = 0;
+      musicPlaying = false;
+    }
+    return;
+  }
 
   let headX = snake[0].x + directionX;
   let headY = snake[0].y + directionY;
@@ -131,6 +136,7 @@ function drawGame() {
 
   context.fillStyle = "white";
   context.font = "20px Arial";
+  context.textAlign = "left"; 
   context.fillText("Score: " + score, 10, 20);
 }
 
@@ -142,7 +148,6 @@ function increaseSpeed() {
   }
 }
 
-// Reiniciar juego al hacer clic en el botón
 restartBtn.addEventListener("click", function () {
   snake = [{ x: 10, y: 10 }];
   directionX = 1;
@@ -156,8 +161,14 @@ restartBtn.addEventListener("click", function () {
   gameSpeed = 150;
 
   restartBtn.style.display = "none";
+
+  backgroundMusic.play();
+  musicPlaying = true;
+
+  clearInterval(gameInterval);
   gameInterval = setInterval(drawGame, gameSpeed);
 });
 
 gameInterval = setInterval(drawGame, gameSpeed);
+
 

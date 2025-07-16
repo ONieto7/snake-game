@@ -31,11 +31,10 @@ This is a classic small Snake game developed using HTML5 Canvas and JavaScript. 
 
 ---
 
-## 🧪 Iteration 3 - In Development
+## 🧪 Iteration 3 - Sound and Restart Features
 
-- Posibles efectos de sonido al comer o morir.
-- Animación más fluida de la serpiente.
-- Posibilidad de reiniciar el juego con una tecla.  
+✔️ Added possible sound effects for eating and dying.
+✔️ Implemented the ability to restart the game with a key press. 
 
 ---
 
