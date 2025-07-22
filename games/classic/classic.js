@@ -4,9 +4,9 @@ const context = canvas.getContext("2d");
 const cellSize = 20;
 const cellCount = canvas.width / cellSize;
 
-const eatSound = new Audio("assets/sounds/eat.mp3");
-const deathSound = new Audio("assets/sounds/death.mp3");
-const backgroundMusic = new Audio("assets/sounds/game_music.mp3");
+const eatSound = new Audio("../../assets/sounds/eat.mp3");
+const deathSound = new Audio("../../assets/sounds/death.mp3");
+const backgroundMusic = new Audio("../../assets/sounds/game_music.mp3");
 backgroundMusic.loop = true;
 backgroundMusic.volume = 0.2;
 
