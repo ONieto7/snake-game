@@ -11,7 +11,8 @@ backgroundMusic.loop = true;
 backgroundMusic.volume = 0.2;
 
 const appleImg = new Image();
-appleImg.src = "../../assets/images/manzana.png";
+appleImg.src = "../../assets/images/platano.png";
+
 
 const restartBtn = document.getElementById("restartBtn");
 
