@@ -10,9 +10,33 @@ const backgroundMusic = new Audio("../../assets/sounds/game_music.mp3");
 backgroundMusic.loop = true;
 backgroundMusic.volume = 0.2;
 
-const appleImg = new Image();
-appleImg.src = "../../assets/images/platano.png";
-
+const fruitTypes = [
+  {
+    name: "manzana",
+    img: (() => { let i = new Image(); i.src = "../../assets/images/manzana.png"; return i; })(),
+    effect: appleEffect
+  },
+  {
+    name: "melocoton",
+    img: (() => { let i = new Image(); i.src = "../../assets/images/melocoton.png"; return i; })(),
+    effect: melocotonEffect
+  },
+  {
+    name: "platano",
+    img: (() => { let i = new Image(); i.src = "../../assets/images/platano.png"; return i; })(),
+    effect: platanoEffect
+  },
+  {
+    name: "sandia",
+    img: (() => { let i = new Image(); i.src = "../../assets/images/sandia.png"; return i; })(),
+    effect: sandiaEffect
+  },
+  {
+    name: "uva",
+    img: (() => { let i = new Image(); i.src = "../../assets/images/uva.png"; return i; })(),
+    effect: uvaEffect
+  }
+];
 
 const restartBtn = document.getElementById("restartBtn");
 
@@ -25,16 +49,23 @@ let gameOver = false;
 let musicPlaying = false;
 let gameSpeed = 150;
 let gameInterval;
+let currentFruitType = getRandomFruitType();
 
 document.addEventListener("keydown", changeDirection);
 restartBtn.addEventListener("click", resetGame);
 gameInterval = setInterval(drawGame, gameSpeed);
+
+
 
 function generateRandomPosition() {
   return {
     x: Math.floor(Math.random() * cellCount),
     y: Math.floor(Math.random() * cellCount)
   };
+}
+
+function getRandomFruitType() {
+  return fruitTypes[Math.floor(Math.random() * fruitTypes.length)];
 }
 
 function changeDirection(event) {
@@ -70,13 +101,14 @@ function drawGame() {
   }
 
   if (checkFruitCollision()) {
-    eatSound.currentTime = 0;
-    eatSound.play();
-    score += 5;
-    fruit = generateRandomPosition();
-    if (score % 25 === 0) increaseSpeed();
+  eatSound.currentTime = 0;
+  eatSound.play();
+  currentFruitType.effect();
+  fruit = generateRandomPosition();
+  currentFruitType = getRandomFruitType();
+  if (score % 25 === 0) increaseSpeed();
   } else {
-    snake.pop();
+  snake.pop();
   }
 
   drawBoard();
@@ -127,9 +159,9 @@ function drawSnake() {
 }
 
 function drawFruit() {
-  if (appleImg.complete && appleImg.naturalWidth !== 0) {
+  if (currentFruitType.img.complete && currentFruitType.img.naturalWidth !== 0) {
     context.drawImage(
-      appleImg,
+      currentFruitType.img,
       fruit.x * cellSize,
       fruit.y * cellSize,
       cellSize,
@@ -139,6 +171,26 @@ function drawFruit() {
     context.fillStyle = "red";
     context.fillRect(fruit.x * cellSize, fruit.y * cellSize, cellSize, cellSize);
   }
+}
+
+function appleEffect() {
+  score += 5;
+}
+
+function melocotonEffect() {
+  score += 10;
+}
+
+function platanoEffect() {
+  score += 15;
+}
+
+function sandiaEffect() {
+  score += 20;
+}
+
+function uvaEffect() {
+  score += 25;
 }
 
 function drawScore() {
@@ -163,6 +215,7 @@ function resetGame() {
   score = 0;
   gameOver = false;
   fruit = generateRandomPosition();
+  currentFruitType = getRandomFruitType();
   gameSpeed = 150;
 
   restartBtn.style.display = "none";

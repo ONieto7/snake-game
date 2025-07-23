@@ -25,6 +25,8 @@ let gameOver = false;
 let musicPlaying = false;
 let gameSpeed = 150;
 let gameInterval;
+let timeLeft = 30; 
+let timerInterval;
 
 document.addEventListener("keydown", changeDirection);
 restartBtn.addEventListener("click", resetGame);
@@ -35,6 +37,17 @@ function generateRandomPosition() {
     x: Math.floor(Math.random() * cellCount),
     y: Math.floor(Math.random() * cellCount)
   };
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      gameOver = true;
+      endGame();
+    }
+  }, 1000);
 }
 
 function changeDirection(event) {
@@ -74,6 +87,7 @@ function drawGame() {
     eatSound.play();
     score += 5;
     fruit = generateRandomPosition();
+    timeLeft += 3;
     if (score % 25 === 0) increaseSpeed();
   } else {
     snake.pop();
@@ -83,6 +97,14 @@ function drawGame() {
   drawFruit();
   drawSnake();
   drawScore();
+  drawTimer();
+}
+
+function drawTimer() {
+  context.fillStyle = "yellow";
+  context.font = "20px Arial";
+  context.textAlign = "right";
+  context.fillText("Time: " + timeLeft + "s", canvas.width - 10, 20);
 }
 
 function updateSnakePosition() {
@@ -164,6 +186,7 @@ function resetGame() {
   gameOver = false;
   fruit = generateRandomPosition();
   gameSpeed = 150;
+  timeLeft = 30;
 
   restartBtn.style.display = "none";
   backgroundMusic.play();
@@ -171,6 +194,7 @@ function resetGame() {
 
   clearInterval(gameInterval);
   gameInterval = setInterval(drawGame, gameSpeed);
+  startTimer();
 }
 
 function endGame() {
@@ -185,6 +209,7 @@ function endGame() {
   context.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 30);
 
   clearInterval(gameInterval);
+  clearInterval(timerInterval);
   restartBtn.style.display = "block";
 
   if (musicPlaying) {
@@ -193,3 +218,5 @@ function endGame() {
     musicPlaying = false;
   }
 }
+
+startTimer();
