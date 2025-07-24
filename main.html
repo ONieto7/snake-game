@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Main Menu</title>
+  <title>Snake - Menu</title>
   <link rel="stylesheet" href="css/main.css" />
   <link rel="icon" href="assets/images/icons-snake-64.png" type="image/png" />
 </head>
@@ -13,7 +13,19 @@
     <button onclick="location.href='games/timer/timer.html'">Modo Contrarreloj</button>
     <button onclick="location.href='games/chaos/chaos.html'">Modo Chaos</button>
     <button disabled>Perfil</button>
-    <button disabled>Ajustes</button>
+    <button id="settingsBtn">Ajustes</button>
   </div>
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <h3>Ajustes de Volumen</h3>
+      <label>
+        Volumen:
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.2" style="width:200px;">
+      </label>
+      <button id="closeSettingsBtn">Salida</button>
+    </div>
+  </div>
+
+  <script src="settings/settings.js"></script>
 </body>
 </html>

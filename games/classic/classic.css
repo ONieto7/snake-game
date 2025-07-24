@@ -19,7 +19,7 @@ canvas {
   border-radius: 12px;
 }
 
-#restartBtn {
+.game-btn {
   margin-top: 24px;
   padding: 14px 32px;
   font-size: 20px;
@@ -32,6 +32,13 @@ canvas {
   transition: background 0.2s;
 }
 
-#restartBtn:hover {
+.game-btn:hover {
   background: #388E3C;
+}
+
+.button-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 24px;
 }
