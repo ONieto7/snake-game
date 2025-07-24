@@ -8,7 +8,11 @@ const eatSound = new Audio("../../assets/sounds/eat.mp3");
 const deathSound = new Audio("../../assets/sounds/death.mp3");
 const backgroundMusic = new Audio("../../assets/sounds/game_music.mp3");
 backgroundMusic.loop = true;
-backgroundMusic.volume = 0.2;
+
+const savedVolume = localStorage.getItem('snakeVolume') || 0.2;
+eatSound.volume = savedVolume;
+deathSound.volume = savedVolume;
+backgroundMusic.volume = savedVolume;
 
 const appleImg = new Image();
 appleImg.src = "../../assets/images/manzana.png";
@@ -170,6 +174,9 @@ function resetGame() {
 
   clearInterval(gameInterval);
   gameInterval = setInterval(drawGame, gameSpeed);
+
+  let menuBtn = document.getElementById("menuBtn");
+  if (menuBtn) menuBtn.remove();
 }
 
 function endGame() {
@@ -185,6 +192,18 @@ function endGame() {
 
   clearInterval(gameInterval);
   restartBtn.style.display = "block";
+
+  let menuBtn = document.getElementById("menuBtn");
+  if (!menuBtn) {
+    menuBtn = document.createElement("button");
+    menuBtn.id = "menuBtn";
+    menuBtn.textContent = "Volver al menú";
+    menuBtn.className = "game-btn";
+    menuBtn.onclick = function() {
+      window.location.href = "../../main.html";
+    };
+    document.querySelector(".button-row").appendChild(menuBtn);
+  }
 
   if (musicPlaying) {
     backgroundMusic.pause();

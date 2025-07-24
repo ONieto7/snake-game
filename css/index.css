@@ -1,12 +1,14 @@
 body {
   min-height: 100vh;
   margin: 0;
-  background: radial-gradient(circle at 60% 40%, #4CAF50 0%, #232526 100%);
+  background: url('../assets/images/fondo-index.png') no-repeat center center fixed;
+  background-size: cover;
   font-family: 'Segoe UI', Arial, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 
 .center-screen {
   background: rgba(20, 20, 20, 0.95);
