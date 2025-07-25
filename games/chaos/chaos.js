@@ -1,4 +1,4 @@
-const canvas = document.querySelector("#gameCanvas");
+const canvas = document.querySelector("#gameCanvas"); 
 const context = canvas.getContext("2d");
 
 const cellSize = 20;
@@ -8,6 +8,10 @@ const eatSound = new Audio("../../assets/sounds/eat.mp3");
 const deathSound = new Audio("../../assets/sounds/death.mp3");
 const backgroundMusic = new Audio("../../assets/sounds/game_music.mp3");
 backgroundMusic.loop = true;
+const BLACKOUT_DURATION = 2000;
+const MIN_GAME_SPEED = 60;
+const MAX_GAME_SPEED = 300;
+
 
 const savedVolume = localStorage.getItem('snakeVolume') || 0.2;
 eatSound.volume = savedVolume;
@@ -54,17 +58,31 @@ let musicPlaying = false;
 let gameSpeed = 150;
 let gameInterval;
 let currentFruitType = getRandomFruitType();
+let hasBlackout = false;
+let isControlsInverted = false;
+
+const normalControls = {
+    ArrowUp:    { x: 0, y: -1, check: () => directionY === 0 },
+    ArrowDown:  { x: 0, y: 1,  check: () => directionY === 0 },
+    ArrowLeft:  { x: -1, y: 0, check: () => directionX === 0 },
+    ArrowRight: { x: 1, y: 0,  check: () => directionX === 0 }
+  };
+
+const invertedControls = {
+    ArrowUp:    { x: 0, y: 1,  check: () => directionY === 0 },
+    ArrowDown:  { x: 0, y: -1, check: () => directionY === 0 },
+    ArrowLeft:  { x: 1, y: 0,  check: () => directionX === 0 },
+    ArrowRight: { x: -1, y: 0, check: () => directionX === 0 }
+  };
 
 document.addEventListener("keydown", changeDirection);
 restartBtn.addEventListener("click", resetGame);
 gameInterval = setInterval(drawGame, gameSpeed);
 
-
-
 function generateRandomPosition() {
   return {
     x: Math.floor(Math.random() * cellCount),
-    y: Math.floor(Math.random() * cellCount)
+    y: Math.floor(Math.random() * (cellCount - 1)) + 1 
   };
 }
 
@@ -73,14 +91,8 @@ function getRandomFruitType() {
 }
 
 function changeDirection(event) {
-  const directions = {
-    ArrowUp:    { x: 0, y: -1, check: () => directionY === 0 },
-    ArrowDown:  { x: 0, y:  1, check: () => directionY === 0 },
-    ArrowLeft:  { x: -1, y: 0, check: () => directionX === 0 },
-    ArrowRight: { x:  1, y: 0, check: () => directionX === 0 }
-  };
-
-  const direction = directions[event.key];
+  const controls = isControlsInverted ? invertedControls : normalControls;
+  const direction = controls[event.key];
 
   if (direction && direction.check()) {
     directionX = direction.x;
@@ -105,20 +117,19 @@ function drawGame() {
   }
 
   if (checkFruitCollision()) {
-  eatSound.currentTime = 0;
-  eatSound.play();
-  currentFruitType.effect();
-  fruit = generateRandomPosition();
-  currentFruitType = getRandomFruitType();
-  if (score % 25 === 0) increaseSpeed();
   } else {
-  snake.pop();
+    snake.pop();
   }
 
   drawBoard();
   drawFruit();
   drawSnake();
   drawScore();
+
+  if (hasBlackout) {
+    context.fillStyle = "rgba(0, 0, 0, 0.85)";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+  }
 }
 
 function updateSnakePosition() {
@@ -138,12 +149,24 @@ function checkCollision() {
 
 function checkFruitCollision() {
   const snakeHead = snake[0];
-  const fruitX = fruit.x;
-  const fruitY = fruit.y;
-  const snakeHeadX = snakeHead.x;
-  const snakeHeadY = snakeHead.y;
+  if (snakeHead.x === fruit.x && snakeHead.y === fruit.y) {
+    eatSound.currentTime = 0;
+    eatSound.play();
 
-  return snakeHeadX === fruitX && snakeHeadY === fruitY;
+    const isGrape = currentFruitType.name === "uva";
+    currentFruitType.effect();
+
+    if (!isGrape) isControlsInverted = false;
+
+    fruit = generateRandomPosition();
+    currentFruitType = getRandomFruitType();
+
+    if (score % 25 === 0) {
+      increaseSpeed();
+    } 
+    return true;
+  }
+  return false;
 }
 
 function drawBoard() {
@@ -183,18 +206,33 @@ function appleEffect() {
 
 function melocotonEffect() {
   score += 10;
+  hasBlackout = true;
+  setTimeout(() => {
+    hasBlackout = false;
+  }, BLACKOUT_DURATION);
 }
 
 function platanoEffect() {
-  score += 15;
+  score += 5;
+  if (gameSpeed > MIN_GAME_SPEED) {
+    gameSpeed -= 30;
+    clearInterval(gameInterval);
+    gameInterval = setInterval(drawGame, gameSpeed);
+  }
 }
 
 function sandiaEffect() {
-  score += 20;
+  score += 5;
+  if (gameSpeed < MAX_GAME_SPEED) {
+    gameSpeed += 30;
+    clearInterval(gameInterval);
+    gameInterval = setInterval(drawGame, gameSpeed);
+  }
 }
 
 function uvaEffect() {
-  score += 25;
+  score += 10;
+  isControlsInverted = true;
 }
 
 function drawScore() {
@@ -221,6 +259,8 @@ function resetGame() {
   fruit = generateRandomPosition();
   currentFruitType = getRandomFruitType();
   gameSpeed = 150;
+  isControlsInverted = false;
+  hasBlackout = false;
 
   restartBtn.style.display = "none";
   backgroundMusic.play();
