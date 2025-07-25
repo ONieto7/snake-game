@@ -36,7 +36,7 @@ gameInterval = setInterval(drawGame, gameSpeed);
 function generateRandomPosition() {
   return {
     x: Math.floor(Math.random() * cellCount),
-    y: Math.floor(Math.random() * cellCount)
+    y: Math.floor(Math.random() * (cellCount - 1)) + 1 
   };
 }
 
